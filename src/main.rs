@@ -121,6 +121,9 @@ fn run(instructions: &[Instruction], registers: &UnsafeCell<Registers>, alloc: &
             },
             Instruction::ExitPointer => {
                 stack.pop();
+                if stack.is_empty() {
+                    return;
+                }
             },
             Instruction::LoadPointer => {
                 let ptr = *stack.last().unwrap();
@@ -161,7 +164,7 @@ fn dump_alloc(registers: &UnsafeCell<Registers>, alloc: &BaseAlloc) {
         unsafe {
             print!("{:02x}", alloc.start.add(i).read_unaligned());
         }
-        if (i + 1) % 16 == 0 {
+        if (i + 1) % 8 == 0 {
             println!();
         }
     }

@@ -1,13 +1,24 @@
-|>>>>>>>>>>>>>>>>+>>>>>>>>>>>>>>>>+^                                          Set the rdx (length) and rdi (file descriptor) registers to 1
->>>>>>>>,                                                                     Load the pointer to the target memory buffer
- [-<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>]                               Copy the first byte of the pointer to rsi
->[-<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>]                            Copy the second byte of the pointer to rsi
->[-<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>]                         Copy the third byte of the pointer to rsi
->[-<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>]                      Copy the fourth byte of the pointer to rsi
->[-<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>]                   Copy the fifth byte of the pointer to rsi
->[-<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>>]                Copy the sixth byte of the pointer to rsi
->[-<<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>>>]             Copy the seventh byte of the pointer to rsi
->[-<<<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>>>>]          Copy the eighth byte of the pointer to rsi
-<<<<<<<++++++++++                                                             Store 0xa (\n) in the target memory buffer
-<<<<<<<<|++++>>>++^>>>>>>>>                                                   Store 0x2000004 (write) in rax
-.                                                                             Call the system call
+>>>>>>>>,                                                            Load the pointer to the target memory buffer
+ [-<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>]                      Copy the first byte of the pointer to rsi
+>[-<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>]                   Copy the second byte of the pointer to rsi
+>[-<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>]                Copy the third byte of the pointer to rsi
+>[-<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>]             Copy the fourth byte of the pointer to rsi
+>[-<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>]          Copy the fifth byte of the pointer to rsi
+>[-<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>>]       Copy the sixth byte of the pointer to rsi
+>[-<<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>>>]    Copy the seventh byte of the pointer to rsi
+>[-<<<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+^>>>>>>>>>>>>>>>] Copy the eighth byte of the pointer to rsi
+<<<<<<<<<<<<<<<|++++>>>++>>>>>>>>>>>>>+>>>>>>>>>>>>>>>>+>>>>>>>>^    Setup the syscall parameters
+>>>>>>>>>+++++++++[<++++++++>-].                                     Print 'H'
+<<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^                                    Reset syscall parameters
+>>>>>>>>>+++++++[<++++>-]<+.                                         Print 'e'
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>+++++++.                     (Reset and) Print 'l'
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^.                                    (Reset and) Print 'l'
+|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>+++.                                 (Reset and) Print 'o'
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>>+++++++++++[<------>-]<-.   (Reset and) Print a comma
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>>++++[<--->-].               (Reset and) print ' '
+<<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>>+++++++++++[<+++++>-].     (Reset and) print 'W'
+<<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>>++++++[<++++>-].           (Reset and) print 'o'
+<<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>+++.                        (Reset and) print 'r'
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>------.                      (Reset and) print 'l'
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>--------.                    (Reset and) print 'd'
+<<<<<<<<|+++>>>++>>>>>>>>>>>>>+^>>>>>>>>>+++++++++++[<------>-]<-.   (Reset and) print '!'
