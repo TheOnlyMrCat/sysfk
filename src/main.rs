@@ -24,15 +24,6 @@ struct Registers {
     // rbx, rsp, and rbp are used by LLVM and therefore cannot be used to perform syscalls through asm!()
 }
 
-impl std::fmt::Display for Registers {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "rax {:016x} rcx {:016x} rdx {:016x} rsi {:016x}", self.rax, self.rcx, self.rdx, self.rsi)?;
-        writeln!(f, "rdi {:016x} r8  {:016x} r9  {:016x} r10 {:016x}", self.rdi, self.r8, self.r9, self.r10)?;
-        writeln!(f, "r11 {:016x} r12 {:016x} r13 {:016x} r14 {:016x}", self.r11, self.r12, self.r13, self.r14)?;
-        writeln!(f, "r15 {:016x}", self.r15)
-    }
-}
-
 struct BaseAlloc {
     start: *mut u8,
     len: usize,
@@ -41,7 +32,6 @@ struct BaseAlloc {
 
 fn main() {
     let filename = std::env::args().nth(1).expect("No filename provided");
-    println!("Executing program at {}", filename);
     let file = std::fs::read_to_string(filename).expect("Could not read file");
     let sysfk = parser::parse(&mut file.chars());
 
@@ -59,11 +49,7 @@ fn main() {
     }
 
     let mut stack = vec![alloc.start];
-    println!("Begin");
     run(&sysfk, &registers, &mut alloc, &mut stack);
-    // Read and dump allocation
-    println!("Finished");
-    dump_alloc(&registers, &alloc);
 }
 
 fn run(instructions: &[Instruction], registers: &UnsafeCell<Registers>, alloc: &mut BaseAlloc, stack: &mut Vec<*mut u8>) {
@@ -155,17 +141,5 @@ fn do_syscall(cell: &UnsafeCell<Registers>) {
             inout("r14") (*registers).r14,
             inout("r15") (*registers).r15,
         );
-    }
-}
-
-fn dump_alloc(registers: &UnsafeCell<Registers>, alloc: &BaseAlloc) {
-    println!("{}", unsafe { *registers.get() });
-    for i in 0..alloc.len {
-        unsafe {
-            print!("{:02x}", alloc.start.add(i).read_unaligned());
-        }
-        if (i + 1) % 8 == 0 {
-            println!();
-        }
     }
 }
