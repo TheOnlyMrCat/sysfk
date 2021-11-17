@@ -19,7 +19,7 @@ Let's elaborate on that a bit more.
 Obviously, the `syscall` assembly instruction requires the registers to be filled with particular numbers. This is accommodated
 for by a specific memory region for syscall registers. The base memory tape is filled in with a pointer to this region when
 the program starts executing, and the region is initially zeroed. This region is copied into the general-purpose registers
-when the `.` command is executed.
+when the `.` command is executed, and the registers are copied back afterwards.
 
 The region contains 8 bytes for each of the following registers, in order:
 - `rax`
@@ -37,3 +37,20 @@ The region contains 8 bytes for each of the following registers, in order:
 - `r15`
 
 `rbx`, `rsp`, and `rbp` are not used.
+
+## Pointers and memory tapes
+
+For the following section, (pointer-width) is used to denote the number of bytes in a pointer.
+
+Cells in a memory tape are 8 bits wide. The base tape is 32 KiB large, but the pointer can be anywhere you want ;)
+
+When the program starts, as mentioned above, the first (pointer-width) cells are filled in with a pointer to the syscall
+registers, in native endian order.
+
+The `,` instruction stores a pointer to the current memory cell in (pointer-width) cells starting with the current memory cell,
+in native endian order.
+
+The `|` instruction reads (pointer-width) cells starting with the current memory cell, in native endian order, and pushes it to
+the current pointer "stack". The top pointer on the stack is what is used in all subsequent operations.
+
+The `^` instruction pops the top pointer from the pointer stack. If the stack is empty, the program exits.

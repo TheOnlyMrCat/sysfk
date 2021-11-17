@@ -2,9 +2,8 @@
 
 use std::cell::UnsafeCell;
 
-use parser::Instruction;
-
 mod parser;
+use parser::Instruction;
 
 #[derive(Default, Clone, Copy)]
 struct Registers {
