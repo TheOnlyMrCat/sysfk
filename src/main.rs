@@ -1,4 +1,4 @@
-#![feature(asm)]
+#![feature(asm, vec_into_raw_parts)]
 
 use std::cell::UnsafeCell;
 
@@ -24,35 +24,26 @@ struct Registers {
     // rbx, rsp, and rbp are used by LLVM and therefore cannot be used to perform syscalls through asm!()
 }
 
-struct BaseAlloc {
-    start: *mut u8,
-    len: usize,
-    layout: std::alloc::Layout,
-}
-
 fn main() {
     let filename = std::env::args().nth(1).expect("No filename provided");
     let file = std::fs::read_to_string(filename).expect("Could not read file");
     let sysfk = parser::parse(&mut file.chars());
 
     let registers = Box::new(UnsafeCell::new(Registers::default()));
-    let layout = std::alloc::Layout::new::<u8>();
-    let mut alloc = BaseAlloc {
-        start: unsafe { std::alloc::realloc(std::alloc::alloc(layout), layout, std::mem::size_of::<usize>()) },
-        len: std::mem::size_of::<usize>(),
-        layout,
-    };
+    let (alloc, len, cap) = vec![0; 32768].into_raw_parts();
 
     let registers_ptr = registers.get();
     unsafe {
-        alloc.start.cast::<*mut Registers>().write_unaligned(registers_ptr);
+        alloc.cast::<*mut Registers>().write_unaligned(registers_ptr);
     }
 
-    let mut stack = vec![alloc.start];
-    run(&sysfk, &registers, &mut alloc, &mut stack);
+    let mut stack = vec![alloc];
+    run(&sysfk, &registers, &mut stack);
+
+    unsafe { drop(Vec::from_raw_parts(alloc, len, cap)); }
 }
 
-fn run(instructions: &[Instruction], registers: &UnsafeCell<Registers>, alloc: &mut BaseAlloc, stack: &mut Vec<*mut u8>) {
+fn run(instructions: &[Instruction], registers: &UnsafeCell<Registers>, stack: &mut Vec<*mut u8>) {
     for instruction in instructions {
         match instruction {
             Instruction::Loop(loop_instructions) => {
@@ -61,37 +52,16 @@ fn run(instructions: &[Instruction], registers: &UnsafeCell<Registers>, alloc: &
                     let value = unsafe { ptr.read() };
                     value != 0
                 } {
-                    run(loop_instructions, registers, alloc, stack);
+                    run(loop_instructions, registers, stack);
                 }
             },
             Instruction::IncrementPointer => {
-                let stack_len = stack.len();
                 let ptr = stack.last_mut().unwrap();
                 *ptr = unsafe { ptr.add(1) };
-                if stack_len == 1 {
-                    // Check if need to expand allocation
-                    let end = unsafe { alloc.start.add(alloc.len) };
-                    if *ptr >= end {
-                        // Reallocate with doubled length
-                        let new_len = alloc.len * 2;
-                        let new_start = unsafe { std::alloc::realloc(alloc.start, alloc.layout, new_len) };
-
-                        // Zero out new memory
-                        let mut cur = end;
-                        while cur < unsafe { new_start.add(new_len) } {
-                            unsafe { *cur = 0; }
-                            cur = unsafe { cur.add(1) };
-                        }
-
-                        // Update alloc
-                        alloc.start = new_start;
-                        alloc.len = new_len;
-                    }
-                }
             },
             Instruction::DecrementPointer => {
-                *stack.last_mut().unwrap() = unsafe { stack.last().unwrap().sub(1) };
-                //TODO: grow allocation backwards
+                let ptr = stack.last_mut().unwrap();
+                *ptr = unsafe { ptr.sub(1) };
             },
             Instruction::IncrementValue => {
                 let ptr = *stack.last().unwrap();

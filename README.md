@@ -10,7 +10,7 @@ brainfuck commands except for the following differences:
 - The `.` command executes the `syscall` assembly instruction
 - The `,` command stores a pointer to the current memory cell in the current memory cell (and the next few, since pointers are large)
 - The new `|` command goes to a sub-tape pointed to by the current memory cell (and the next few)
-- The new `^` command exits from a sub-tape
+- The new `^` command exits from a sub-tape (or exits the program, if in the base tape)
 
 Let's elaborate on that a bit more.
 
