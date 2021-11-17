@@ -109,11 +109,11 @@ fn run(instructions: &[Instruction], registers: &UnsafeCell<Registers>, alloc: &
             },
             Instruction::IncrementValue => {
                 let ptr = *stack.last().unwrap();
-                unsafe { *ptr = *ptr.wrapping_add(1) };
+                unsafe { *ptr = (*ptr).wrapping_add(1) };
             },
             Instruction::DecrementValue => {
                 let ptr = *stack.last().unwrap();
-                unsafe { *ptr = *ptr.wrapping_sub(1) };
+                unsafe { *ptr = (*ptr).wrapping_sub(1) };
             },
             Instruction::EnterPointer => {
                 let ptr = *stack.last().unwrap();
